@@ -1,1 +1,3 @@
 Ryan Bautista - I am a student in Hunter College wishing to become a video game developer. My favorite color is blue.
+
+Jeremy Gonzalez - I am a computer science student at Hunter College and I am interested in data science and machine learning.
