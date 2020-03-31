@@ -1,3 +1,0 @@
-include ':app',':spotify-app-remote-release-0.7.0'
-rootProject.name='Music_Compromiser'
-include ':musiccompromiser'
