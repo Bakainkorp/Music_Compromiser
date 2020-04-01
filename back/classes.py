@@ -20,7 +20,7 @@ class Server:
 
     def populate_datalist(self, input_json, user):
         self.datalist.append(User(user))
-        for item in input_json['items']:
+        for item in input_json:
             try:
                 self.datalist[-1].uri_list.append(item['uri'])
             except KeyError:
@@ -56,9 +56,14 @@ class User:
 servers = []
 
 '''
-with open('testdata.json') as json_file:
+with open('myfile.json') as json_file:
     data = json.load(json_file)
 
 Server("TAD", data)
 print("reeee")
+
+out = {'user' : 'test user', 'data': data}
+print("ree")
+file1 = open("myfile.txt","w") 
+file1.write(json.dumps(out))
 '''
