@@ -54,7 +54,7 @@ public class LoginActivity extends AppCompatActivity {
     // Request code will be used to verify if result comes from the login activity. Can be set to any integer.
     private static final int REQUEST_CODE = 1337;
     private static final String REDIRECT_URI = "musiccompromiser://callback";
-    private static final String SCOPES = "user-read-recently-played,user-library-modify,user-read-email,user-read-private,playlist-read-collaborative";
+    private static final String SCOPES = "user-read-recently-played,user-library-modify,user-read-email,user-read-private,playlist-read-collaborative, user-top-read";
     private static final String CLIENT_ID = "0fc19e947472492c930bef713d0d5482";
 
 

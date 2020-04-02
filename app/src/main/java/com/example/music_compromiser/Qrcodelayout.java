@@ -2,6 +2,7 @@ package com.example.music_compromiser;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -17,16 +18,25 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.zxing.BarcodeFormat;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
 
 public class Qrcodelayout extends AppCompatActivity {
 
@@ -36,9 +46,12 @@ public class Qrcodelayout extends AppCompatActivity {
     private String userid;
     private String mServerid = ""; // the server id from the server for each user phone
     private String URL;
-    private String mServerURL = "https://benjaminlgur.pythonanywhere.com/serverid?serverid=1";
+  //  private String mServerURL = "https://benjaminlgur.pythonanywhere.com/serverid?serverid=1";
+    private String mServerURLHost = "http://benjaminlgur.pythonanywhere.com/host";
+    private String mServerURLJoin;
     private Button mContinueButton;
     private String connection = "";
+    private String otherphoneid; // the server id for other phone
 
 
 
@@ -86,7 +99,11 @@ public class Qrcodelayout extends AppCompatActivity {
 //        };
 //        mRequestQueue.add(stringRequest);
 
-        getServerID();
+        try {
+            getServerID();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
 
         // after user that pressed join button scans qr code connect and go to
@@ -99,6 +116,7 @@ public class Qrcodelayout extends AppCompatActivity {
             public void onClick(View v) {
                 if(connection.equals("True")){
                     Intent intent = new Intent(Qrcodelayout.this, PlaylistLayout.class);
+                    signalOtherUser();
                     startActivity(intent);
                 }
                 else{
@@ -116,19 +134,33 @@ public class Qrcodelayout extends AppCompatActivity {
 
 
 
-    public void getServerID(){
+    public void getServerID() throws JSONException {
+
+        username = getIntent().getStringExtra("username");
+        String topsongs = getIntent().getStringExtra("topsongs");
+        JSONArray array = new JSONArray(topsongs);
+
+//        Map<String, String> postParam= new HashMap<String, String>();
+//        postParam.put("user", username);
+//        postParam.put("data", array.toString());
+       // new JSONObject(postParam)
+
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("user", username);
+        jsonObject.put("data", array);
 
         mRequestQueue = Volley.newRequestQueue(this);
-        StringRequest serverStringRequest = new StringRequest(Request.Method.POST, mServerURL,
-                new Response.Listener<String>() {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, mServerURLHost, jsonObject,
+                new Response.Listener<JSONObject>() {
                     @Override
-                    public void onResponse(String response) {
-
-
+                    public void onResponse(JSONObject response) {
                         try {
                             //JSONObject jsonObject = response.optJSONObject("user");
-                           // serverid = jsonObject.toString();
-                            mServerid =  response;
+                            // serverid = jsonObject.toString();
+                            mServerid = response.getString("serverid");
+                            Toast.makeText(Qrcodelayout.this,mServerid,Toast.LENGTH_LONG).show();
+
 
                             BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
                             Bitmap bitmap = barcodeEncoder.encodeBitmap(mServerid, BarcodeFormat.QR_CODE, 800, 800);
@@ -141,6 +173,7 @@ public class Qrcodelayout extends AppCompatActivity {
                         }
 
                     }
+
                 },
                 new Response.ErrorListener() {
                     @Override
@@ -150,6 +183,8 @@ public class Qrcodelayout extends AppCompatActivity {
 
                     }
                 }) {
+
+
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<>();
@@ -162,10 +197,7 @@ public class Qrcodelayout extends AppCompatActivity {
 
         };
 
-
-        Log.d("test", "getServerID: ");
-        Log.d("serverid", mServerid);
-        mRequestQueue.add(serverStringRequest);
+        mRequestQueue.add(jsonObjectRequest);
     }
 
 
@@ -180,7 +212,7 @@ public class Qrcodelayout extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            JSONObject jsonObject = response.optJSONObject("connectionworked");
+                            JSONObject jsonObject = response.optJSONObject("connectionworks");
                             connection = jsonObject.toString();
 
 
@@ -209,8 +241,66 @@ public class Qrcodelayout extends AppCompatActivity {
 
         };
 
-
+        mRequestQueue.add(jsonObjectRequest);
 
 
     }
+
+
+    //tell other user to continue to playlist layout
+    public void signalOtherUser(){
+        String url = "";
+        mRequestQueue = Volley.newRequestQueue(this);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+              new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String response){
+                try {
+
+                }catch (Exception e){
+
+                }
+
+            }
+
+        },
+             new Response.ErrorListener()  {
+                 @Override
+                 public void onErrorResponse(VolleyError error) {
+
+                 }
+
+             })  {
+
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Continue", "True");
+                params.put("userid", otherphoneid);
+
+                return params;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String token = mSharedPreferences.getString("token", "");
+                String auth = "Bearer " + token;
+                headers.put("Authorization", auth);
+                return headers;
+            }
+
+
+                };
+
+
+
+        mRequestQueue.add(stringRequest);
+
+    }
+
+
+
 }
