@@ -3,10 +3,12 @@ package com.example.music_compromiser;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -35,17 +37,27 @@ import com.spotify.protocol.client.Subscription;
 import com.spotify.protocol.types.PlayerState;
 import com.spotify.protocol.types.Track;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Map;
+
 
 import static com.spotify.sdk.android.auth.AccountsQueryParameters.CLIENT_ID;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String CLIENT_ID = "c0380c5b6c1a454e98fab306bb0a01a2";
+    private static final String CLIENT_ID = "0fc19e947472492c930bef713d0d5482";
     private static final String REDIRECT_URI = "musiccompromiser://callback";
     private SpotifyAppRemote mSpotifyAppRemote;
     private Button playlistbutton;
@@ -57,7 +69,8 @@ public class MainActivity extends AppCompatActivity {
     private String username;
     private String userid;
     private String userserverid;
-    private RequestQueue mRequestQueue2;
+    private JSONArray topsongs = new JSONArray();
+
 
 
 
@@ -69,12 +82,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mSharedPreferences = getSharedPreferences("SPOTIFY", 0);
         mRequestQueue = Volley.newRequestQueue(MainActivity.this);
-        mRequestQueue2 = Volley.newRequestQueue(MainActivity.this);
 
         playlistbutton = findViewById(R.id.button4);
         joinbutton = findViewById(R.id.button2);
         hostbutton = findViewById(R.id.button);
         Pastplaylistsbutton = findViewById(R.id.button3);
+
+        getUserName();
+        gettopTracks();
 
 
         playlistbutton.setOnClickListener(new View.OnClickListener() {
@@ -104,11 +119,12 @@ public class MainActivity extends AppCompatActivity {
                 Intent qrcodeIntent = new Intent(MainActivity.this, Qrcodelayout.class);
                 qrcodeIntent.putExtra("username", username);
                 qrcodeIntent.putExtra("userid", userid);
+                qrcodeIntent.putExtra("topsongs", topsongs.toString());
                 startActivity(qrcodeIntent);
             }
         });
 
-        //getUserName();
+
     }
 
     // Get the results:
@@ -120,17 +136,19 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_LONG).show();
             } else {
                 //get id from the server from the other phone
- /*
+
 
                 userserverid = result.getContents();
                 Toast.makeText(MainActivity.this, "You are connected!", Toast.LENGTH_LONG).show();
                 Toast.makeText(MainActivity.this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
-
-                Intent userIntent = new Intent(MainActivity.this, AcceptConnection.class);
+                //sendConnectionWorks();
+                Intent userIntent = new Intent(MainActivity.this, LoadingPage.class);
+                userIntent.putExtra("userid", userid);
                 userIntent.putExtra("userserverid", userserverid);
+                userIntent.putExtra("data", topsongs.toString());
                 startActivity(userIntent);
 
-                */
+
 
 
             }
@@ -145,10 +163,15 @@ public class MainActivity extends AppCompatActivity {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        JSONObject jsonObject = response.optJSONObject("display_name");
-                        username = jsonObject.toString();
-                        jsonObject = response.optJSONObject("id");
-                        userid = jsonObject.toString();
+                        try {
+                            username = response.getString("display_name");
+                            userid =  response.getString("id");
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
 
                     }
                 },
@@ -168,12 +191,57 @@ public class MainActivity extends AppCompatActivity {
             return headers;
         }
     };
-        mRequestQueue2.add(jsonObjectRequest);
+        mRequestQueue.add(jsonObjectRequest);
 
 
     }
 
-// tell other phone that this phone was able to connect
+
+
+    public void gettopTracks(){
+
+        String toptracks = "https://api.spotify.com/v1/me/top/tracks";
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, toptracks, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        String file_name = "C:\\Users\\Jeremy\\Desktop\\sample.txt";
+                        JSONArray jsonArray = response.optJSONArray("items");
+                        topsongs = jsonArray;
+
+                        //Log.d("data", response.toString());
+
+
+
+
+                                 //Log.d("data", jsonArray.getJSONObject(i).toString());
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }){   @Override
+        public Map<String, String> getHeaders() throws AuthFailureError {
+            Map<String, String> headers = new HashMap<>();
+            String token = mSharedPreferences.getString("token", "");
+            String auth = "Bearer " + token;
+            headers.put("Authorization", auth);
+            return headers;
+        }
+        };
+
+        mRequestQueue.add(jsonObjectRequest);
+
+
+    }
+
+// tell other phone that this phone was able to connect and send this phones own serverid and userid to other
+    // phone
     public void sendConnectionWorks(){
         String url = "";
 

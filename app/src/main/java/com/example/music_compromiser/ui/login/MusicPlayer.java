@@ -94,6 +94,45 @@ public class MusicPlayer extends AppCompatActivity {
 
     }
 
+    public void getCombinedPlaylist(){
+        String combinedURL = "http://benjaminlgur.pythonanywhere.com/start";
+        String x = "";
+
+        mRequestQueue = Volley.newRequestQueue(this);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, combinedURL, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }){
+
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String token = mSharedPreferences.getString("token", "");
+                String auth = "Bearer " + token;
+                headers.put("Authorization", auth);
+                return headers;
+            }
+
+
+        };
+
+        mRequestQueue.add(jsonObjectRequest);
+
+
+    }
+
     public void getUserSongs(){
         String songEndPoint = "https://api.spotify.com/v1/playlists/" + mPlaylistId + "/tracks";
 
