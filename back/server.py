@@ -19,8 +19,9 @@ def host():
         server = Server(host, data)
         output = {'serverid': server.serverid}
         return json.dumps(output)
-    except:
-        return 'error'
+    except Exception as e:
+        return str(e)
+
 
 @app.route('/join', methods=['POST'])
 def join():
@@ -31,7 +32,7 @@ def join():
         data = input['data'] #this should be the top tracks json that you get from the api call
         success = {'success': 'False'}
         for server in servers:
-            if server.serverid == serverid:
+            if str(server.serverid) == serverid:
                 server.user_join(client, data)
                 success['success'] = 'True'
                 return json.dumps(success)
@@ -42,14 +43,24 @@ def join():
 @app.route('/start', methods=['POST'])
 def start():
     try:
-        req_data = request.args
-        serverid = req_data.get('serverid')
+        req_data = request.get_json()
+        serverid = req_data['serverid']
         for server in servers:
-            if server.serverid == serverid:
-                server.make_comprimise()
+            if str(server.serverid) == str(serverid):
+                if len(server.complist) == 0:
+                    server.make_comprimise()
                 return(json.dumps(server.complist))
-    except:
-        return 'error'
+        return 'server not found'
+    except Exception as e:
+        return str(e)
+
+
+@app.route('/show')
+def show():
+    out = []
+    for server in servers:
+        out.append(server.serverid)
+    return json.dumps(out)
 
 @app.route('/kill')
 def kill():
