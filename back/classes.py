@@ -2,6 +2,9 @@ import random
 import json
 from spotpy import get_genres
 
+
+servers = []
+
 class Server:
     def __init__(self, host, host_json):
         self.users = [host]
@@ -74,7 +77,6 @@ class User:
             
 
 
-servers = []
 
 '''
 with open('testdata.json') as json_file:
