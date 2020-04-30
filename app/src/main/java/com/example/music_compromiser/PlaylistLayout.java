@@ -5,14 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
@@ -22,16 +20,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.music_compromiser.R;
-import com.example.music_compromiser.PlayList;
 import com.example.music_compromiser.ui.login.MusicPlayer;
 import com.google.gson.Gson;
-import com.spotify.android.appremote.api.ConnectionParams;
-import com.spotify.android.appremote.api.Connector;
-import com.spotify.android.appremote.api.SpotifyAppRemote;
 
-
-import com.spotify.protocol.types.Track;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,13 +32,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import android.content.SharedPreferences;
-import android.os.Bundle;
-
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.android.volley.RequestQueue;
 
 public class PlaylistLayout extends AppCompatActivity {
 
@@ -97,7 +81,7 @@ public class PlaylistLayout extends AppCompatActivity {
                                 JSONObject object = jsonArray.getJSONObject(n);
                                 PlayList tempPlayList = new PlayList();
 
-                                tempPlayList.setPlayListId(object.getString("id"));
+                                tempPlayList.setPlayListURI(object.getString("id"));
 
                                 tempPlayList.setPlayListTitle(object.getString("name"));
                                 tempPlayList.setPlayListEndPoint(object.getString("uri"));
@@ -169,7 +153,7 @@ public class PlaylistLayout extends AppCompatActivity {
         }
 
         public void onBind(PlayList playList) {
-            playListId = playList.getPlayListId();
+            playListId = playList.getPlayListURI();
             playListEndPoint = playList.getPlayListEndPoint();
 
             playListTitle.setText(playList.getPlayListTitle());

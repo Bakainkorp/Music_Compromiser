@@ -54,8 +54,8 @@ public class LoginActivity extends AppCompatActivity {
     // Request code will be used to verify if result comes from the login activity. Can be set to any integer.
     private static final int REQUEST_CODE = 1337;
     private static final String REDIRECT_URI = "musiccompromiser://callback";
-    private static final String SCOPES = "user-read-recently-played,user-library-modify,user-read-email,user-read-private,playlist-read-collaborative, user-top-read";
-    private static final String CLIENT_ID = "0fc19e947472492c930bef713d0d5482";
+    private static final String SCOPES = "streaming,user-read-currently-playing,user-read-playback-position,app-remote-control,user-read-recently-played,user-library-modify,user-read-email,user-read-private,playlist-read-collaborative,playlist-read-private,user-top-read,playlist-modify,playlist-modify-public,playlist-modify-private,user-library-modify";
+    private static final String CLIENT_ID = "";
 
 
 
@@ -152,9 +152,9 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-//    final Request request = new Request.Builder()
-//            .url("https://api.spotify.com/v1/me")
-//            .addHeader("Authorization", "Bearer " + mAccessToken)
-//            .build();
+    final Request request = new Request.Builder()
+            .url("https://api.spotify.com/v1/me")
+            .addHeader("Authorization", "Bearer " + mAccessToken)
+            .build();
 
 }

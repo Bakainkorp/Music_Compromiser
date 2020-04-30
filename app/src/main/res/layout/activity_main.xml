@@ -4,15 +4,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#56F331"
+    android:background="#E9E9E9"
     android:foreground="#001F9E1F"
     tools:context=".MainActivity">
 
+    <ImageView
+        android:id="@+id/enchanted_logo_no_background"
+        android:layout_width="115dp"
+        android:layout_height="115dp"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="68dp"
+        android:background="@drawable/ic_logo"
+        android:textColor="#000000"
+        android:textSize="50sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <Button
+
         android:id="@+id/button3"
         android:layout_width="275dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/btn_rounded"
+        android:background="#32BEA6"
         android:elevation="2dp"
         android:fontFamily="@font/montserrat_bold"
         android:paddingTop="10dp"
@@ -32,7 +48,7 @@
         style="@style/Widget.AppCompat.Button"
         android:layout_width="275dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/btn_rounded"
+        android:background="#32BEA6"
         android:elevation="2dp"
         android:fadingEdgeLength="@android:dimen/dialog_min_width_minor"
         android:fontFamily="@font/montserrat_bold"
@@ -53,7 +69,7 @@
         android:id="@+id/button2"
         android:layout_width="275dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/btn_rounded"
+        android:background="#32BEA6"
         android:elevation="2dp"
         android:fontFamily="@font/montserrat_bold"
         android:paddingTop="10dp"
@@ -70,42 +86,20 @@
         app:layout_constraintVertical_bias="0.491" />
 
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="298dp"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/montserrat_bold"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.51"
-        tools:text="Compromiser" />
-
-    <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/montserrat_bold"
-        android:text="Music"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/textView"
+        android:layout_marginTop="100dp"
+        android:fontFamily="@font/pacifico"
+        android:text=" Music Compromiser"
+        android:textColor="#32BEA6"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toTopOf="@+id/enchanted_logo_no_background"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.458"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.892" />
+        app:layout_constraintVertical_bias="0.0" />
 
-    <Button
-        android:id="@+id/button4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="playlist"
-        app:layout_constraintBottom_toTopOf="@+id/button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
