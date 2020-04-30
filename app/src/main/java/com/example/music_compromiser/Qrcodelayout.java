@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -23,6 +24,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.music_compromiser.ui.login.MusicPlayer;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.zxing.BarcodeFormat;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
@@ -46,12 +49,14 @@ public class Qrcodelayout extends AppCompatActivity {
     private String userid;
     private String mServerid = ""; // the server id from the server for each user phone
     private String URL;
-  //  private String mServerURL = "https://benjaminlgur.pythonanywhere.com/serverid?serverid=1";
-    private String mServerURLHost = "http://benjaminlgur.pythonanywhere.com/host";
+  //private String mServerURLHost = "https://192.168.1.3:5000/host";
+    private String mServerURLHost = "https://benjaminlgur.pythonanywhere.com/host";
     private String mServerURLJoin;
     private Button mContinueButton;
     private String connection = "";
     private String otherphoneid; // the server id for other phone
+    private FirebaseDatabase mFirebaseDatabase;
+
 
 
 
@@ -60,6 +65,10 @@ public class Qrcodelayout extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qrcodelayout);
         mSharedPreferences = getSharedPreferences("SPOTIFY", 0);
+        mRequestQueue = Volley.newRequestQueue(Qrcodelayout.this);
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+
+        userid = getIntent().getStringExtra("userid");
 
 //         URL = "";
 //
@@ -114,14 +123,23 @@ public class Qrcodelayout extends AppCompatActivity {
         mContinueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(connection.equals("True")){
-                    Intent intent = new Intent(Qrcodelayout.this, PlaylistLayout.class);
-                    signalOtherUser();
+               // if(connection.equals("True")){
+
+
+                Map<String, Object> currentlyPlayingSong = new HashMap<>();
+                currentlyPlayingSong.put("currentSong", "empty");
+                currentlyPlayingSong.put("currentArtist", "empty");
+                currentlyPlayingSong.put("currentImage", "empty");
+                mFirebaseDatabase.getReference().child("currentlyPlayingSong").child(mServerid).setValue(currentlyPlayingSong);
+                    Intent intent = new Intent(Qrcodelayout.this, MusicPlayer.class);
+                    intent.putExtra("serverid", mServerid);
+                    intent.putExtra("userid", userid);
+                    intent.putExtra("username", username);
                     startActivity(intent);
-                }
-                else{
-                    Toast.makeText(Qrcodelayout.this, "Connection Unsuccessful", Toast.LENGTH_LONG).show();
-                }
+              //  }
+               // else{
+                //    Toast.makeText(Qrcodelayout.this, "Connection Unsuccessful", Toast.LENGTH_LONG).show();
+               // }
             }
         });
 
@@ -150,6 +168,7 @@ public class Qrcodelayout extends AppCompatActivity {
         jsonObject.put("user", username);
         jsonObject.put("data", array);
 
+
         mRequestQueue = Volley.newRequestQueue(this);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, mServerURLHost, jsonObject,
                 new Response.Listener<JSONObject>() {
@@ -166,6 +185,12 @@ public class Qrcodelayout extends AppCompatActivity {
                             Bitmap bitmap = barcodeEncoder.encodeBitmap(mServerid, BarcodeFormat.QR_CODE, 800, 800);
                             ImageView imageViewQrCode = (ImageView) findViewById(R.id.qrCode);
                             imageViewQrCode.setImageBitmap(bitmap);
+
+                            Map<String, Object> userInfo = new HashMap<>();
+                            userInfo.put("voteToSkip", 0);
+                            userInfo.put("voteForPrevious", 0);
+                            userInfo.put("hasUserVoted","false");
+                            mFirebaseDatabase.getReference().child("actionRequested").child(mServerid).child(userid).setValue(userInfo);
 
 
                         }catch (Exception e){
@@ -196,6 +221,7 @@ public class Qrcodelayout extends AppCompatActivity {
 
 
         };
+
 
         mRequestQueue.add(jsonObjectRequest);
     }

@@ -57,10 +57,9 @@ import static com.spotify.sdk.android.auth.AccountsQueryParameters.CLIENT_ID;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String CLIENT_ID = "0fc19e947472492c930bef713d0d5482";
+    private static final String CLIENT_ID = "";
     private static final String REDIRECT_URI = "musiccompromiser://callback";
     private SpotifyAppRemote mSpotifyAppRemote;
-    private Button playlistbutton;
     private Button joinbutton;
     private Button hostbutton;
     private Button Pastplaylistsbutton;
@@ -83,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         mSharedPreferences = getSharedPreferences("SPOTIFY", 0);
         mRequestQueue = Volley.newRequestQueue(MainActivity.this);
 
-        playlistbutton = findViewById(R.id.button4);
+
         joinbutton = findViewById(R.id.button2);
         hostbutton = findViewById(R.id.button);
         Pastplaylistsbutton = findViewById(R.id.button3);
@@ -92,13 +91,6 @@ public class MainActivity extends AppCompatActivity {
         gettopTracks();
 
 
-        playlistbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent newintent = new Intent(MainActivity.this, PlaylistLayout.class);
-                startActivity(newintent);
-            }
-        });
 
 
         joinbutton.setOnClickListener(new View.OnClickListener() {
@@ -145,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent userIntent = new Intent(MainActivity.this, LoadingPage.class);
                 userIntent.putExtra("userid", userid);
                 userIntent.putExtra("userserverid", userserverid);
+                userIntent.putExtra("username", username);
                 userIntent.putExtra("data", topsongs.toString());
                 startActivity(userIntent);
 
@@ -182,7 +175,9 @@ public class MainActivity extends AppCompatActivity {
                         Log.d("sample", error.toString());
 
                     }
-                }){   @Override
+                }){
+
+            @Override
         public Map<String, String> getHeaders() throws AuthFailureError {
             Map<String, String> headers = new HashMap<>();
             String token = mSharedPreferences.getString("token", "");
@@ -207,8 +202,10 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
 
-                        String file_name = "C:\\Users\\Jeremy\\Desktop\\sample.txt";
                         JSONArray jsonArray = response.optJSONArray("items");
+                        Log.d("toptracksjson1", jsonArray.toString());
+
+
                         topsongs = jsonArray;
 
                         //Log.d("data", response.toString());

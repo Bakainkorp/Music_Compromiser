@@ -4,9 +4,10 @@ package com.example.music_compromiser;
 public class PlayList {
         private String PlayListEndPoint;
         private String PlayListTitle;
-        private String PlayListId;
+        private String PlayListURI;
         private String numberOfTracks;
         private String imageUrl;
+
 
 
         public String getImageUrl() {
@@ -29,12 +30,12 @@ public class PlayList {
             return PlayListTitle;
         }
 
-        public String getPlayListId() {
-            return PlayListId;
+        public String getPlayListURI() {
+            return PlayListURI;
         }
 
-        public void setPlayListId(String playListId) {
-            PlayListId = playListId;
+        public void setPlayListURI(String playListURI) {
+            PlayListURI = playListURI;
         }
 
         public void setPlayListTitle(String playListTitle) {

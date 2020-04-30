@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "501387511088",
+    "firebase_url": "https://real-time-voting-system.firebaseio.com",
+    "project_id": "real-time-voting-system",
+    "storage_bucket": "real-time-voting-system.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:501387511088:android:88d11fa7106e37dfaef4f5",
+        "android_client_info": {
+          "package_name": "com.example.music_compromiser"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "501387511088-nfi9pr28hdi6ft4hhfmp1v5qt7ilvuuk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB577DvCmSr_4EFHvHwEkaObuGRcw4rNEw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "501387511088-nfi9pr28hdi6ft4hhfmp1v5qt7ilvuuk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
