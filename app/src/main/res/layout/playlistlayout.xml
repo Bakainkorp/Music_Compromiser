@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:foreground="#001F9E1F"
-    tools:context=".Playlistplayer">
+    tools:context=".PastPlaylists">
 
 
     <androidx.recyclerview.widget.RecyclerView

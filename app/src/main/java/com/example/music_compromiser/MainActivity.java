@@ -57,7 +57,7 @@ import static com.spotify.sdk.android.auth.AccountsQueryParameters.CLIENT_ID;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String CLIENT_ID = "";
+    private static final String CLIENT_ID = "0fc19e947472492c930bef713d0d5482";
     private static final String REDIRECT_URI = "musiccompromiser://callback";
     private SpotifyAppRemote mSpotifyAppRemote;
     private Button joinbutton;
@@ -113,6 +113,16 @@ public class MainActivity extends AppCompatActivity {
                 qrcodeIntent.putExtra("userid", userid);
                 qrcodeIntent.putExtra("topsongs", topsongs.toString());
                 startActivity(qrcodeIntent);
+            }
+        });
+
+        Pastplaylistsbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent pastPlaylistsintent = new Intent(MainActivity.this, PastPlaylists.class);
+
+
+                startActivity(pastPlaylistsintent);
             }
         });
 

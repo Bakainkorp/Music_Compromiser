@@ -49,7 +49,7 @@ public class PastPlaylists extends AppCompatActivity {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent i = new Intent(PastPlaylists.this, MusicPlayer.class);
+                    Intent i = new Intent(PastPlaylists.this, PastPlaylistsMusicPlayer.class);
                     i.putExtra("playListId",playListId);
                     i.putExtra("endPoint",playListEndPoint);
                     startActivity(i);
@@ -82,7 +82,7 @@ public class PastPlaylists extends AppCompatActivity {
         @NonNull
         @Override
         public playListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View v = getLayoutInflater().inflate(R.layout.activity_past_playlists, parent, false);
+            View v = getLayoutInflater().inflate(R.layout.recyclerview_playlist_item, parent, false);
             return new playListViewHolder(v);
         }
 
