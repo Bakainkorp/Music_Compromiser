@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Base64;
@@ -52,6 +53,7 @@ import com.spotify.android.appremote.api.Connector;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.protocol.client.CallResult;
 import com.spotify.protocol.client.Result;
+import com.spotify.protocol.client.Subscription;
 import com.spotify.protocol.types.Image;
 import com.spotify.protocol.types.ImageUri;
 import com.spotify.protocol.types.LibraryState;
@@ -78,7 +80,7 @@ import java.util.concurrent.TimeUnit;
 public class MusicPlayer extends AppCompatActivity {
 
             //Spotify
-            private static final String CLIENT_ID = "";
+            private static final String CLIENT_ID = "0fc19e947472492c930bef713d0d5482";
             private static final String REDIRECT_URI = "musiccompromiser://callback";
             private SpotifyAppRemote mSpotifyAppRemote;
             private String serverid = "";
@@ -93,6 +95,9 @@ public class MusicPlayer extends AppCompatActivity {
             private TextView mCurrentArtist;
             private TextView mTextview;
             private ImageView mImage;
+            private TextView mNextCountVote;
+            private TextView mPreviousCountVote;
+
             //Other
             private boolean isCurrentlyPlaying = false;
             private  FirebaseDatabase mFirebaseDataBase;
@@ -153,6 +158,10 @@ public class MusicPlayer extends AppCompatActivity {
                 mNextTrackBtn = (ImageButton) findViewById(R.id.skipnext);
                 mPreviousTrackbtn = (ImageButton) findViewById(R.id.skiprevious);
                 mImage = findViewById(R.id.playerimage);
+                mNextCountVote = findViewById(R.id.ID_nextCountVote);
+                mPreviousCountVote = findViewById(R.id.ID_previousCount);
+
+
 
 
                 // mNextTrackBtn = (ImageButton) findViewById(R.id.next_btn);
@@ -197,6 +206,7 @@ public class MusicPlayer extends AppCompatActivity {
                         voteToSkip.put("voteToSkip", 1);
                         //if this deletes other child then use merger option
                         mFirebaseDataBase.getReference().child("actionRequested").child(serverid).child(userid).updateChildren(voteToSkip);
+                        mNextTrackBtn.setBackgroundColor(Color.parseColor("#FF0000"));
 
 
 
@@ -222,6 +232,7 @@ public class MusicPlayer extends AppCompatActivity {
                         voteToSkip.put("voteForPrevious", 1);
                         //if this deletes other child then use merger option
                        mFirebaseDataBase.getReference().child("actionRequested").child(serverid).child(userid).updateChildren(voteToSkip);
+                        mPreviousTrackbtn.setBackgroundColor(Color.parseColor("#FF0000"));
                     }
                 });
 
@@ -245,6 +256,9 @@ public class MusicPlayer extends AppCompatActivity {
 
                             }
 
+                            mPreviousCountVote.setText(String.valueOf(totalVoteForPrevious));
+                            mNextCountVote.setText(String.valueOf(totalVoteToSkip));
+
                             Log.d("totalvotetoskip", String.valueOf(totalVoteToSkip));
                             Log.d("totalvotetoskipprev", String.valueOf(totalVoteForPrevious));
 
@@ -261,6 +275,9 @@ public class MusicPlayer extends AppCompatActivity {
                                     voteToSkip.put("voteToSkip", 0);
                                     //if this deletes other child then use merger option
                                     mFirebaseDataBase.getReference().child("actionRequested").child(serverid).child(userid).updateChildren(voteToSkip);
+                                    mPreviousTrackbtn.setBackgroundColor(Color.parseColor("#000000FF"));
+                                    mNextTrackBtn.setBackgroundColor(Color.parseColor("#000000FF"));
+
                                 } else {
                                     tracknum++;
                                     wasplayed = false;
@@ -273,6 +290,8 @@ public class MusicPlayer extends AppCompatActivity {
                                     voteToSkip.put("voteToSkip", 0);
                                     //if this deletes other child then use merger option
                                     mFirebaseDataBase.getReference().child("actionRequested").child(serverid).child(userid).updateChildren(voteToSkip);
+                                    mPreviousTrackbtn.setBackgroundColor(Color.parseColor("#000000FF"));
+                                    mNextTrackBtn.setBackgroundColor(Color.parseColor("#000000FF"));
                                 }
 
                             }
@@ -283,10 +302,30 @@ public class MusicPlayer extends AppCompatActivity {
                                     tracknum = mSongs.size()-1;
                                     wasplayed = false;
                                     mSpotifyAppRemote.getPlayerApi().play(mSongs.get(tracknum).getUri());
+                                    Map<String, Object> voteForPrevious = new HashMap<>();
+                                    voteForPrevious.put("voteForPrevious", 0);
+                                    //if this deletes other child then use merger option
+                                    mFirebaseDataBase.getReference().child("actionRequested").child(serverid).child(userid).updateChildren(voteForPrevious);
+                                    Map<String, Object> voteToSkip = new HashMap<>();
+                                    voteToSkip.put("voteToSkip", 0);
+                                    //if this deletes other child then use merger option
+                                    mFirebaseDataBase.getReference().child("actionRequested").child(serverid).child(userid).updateChildren(voteToSkip);
+                                    mPreviousTrackbtn.setBackgroundColor(Color.parseColor("#000000FF"));
+                                    mNextTrackBtn.setBackgroundColor(Color.parseColor("#000000FF"));
                                 } else {
                                     tracknum--;
                                     wasplayed = false;
                                     mSpotifyAppRemote.getPlayerApi().play(mSongs.get(tracknum).getUri());
+                                    Map<String, Object> voteForPrevious = new HashMap<>();
+                                    voteForPrevious.put("voteForPrevious", 0);
+                                    //if this deletes other child then use merger option
+                                    mFirebaseDataBase.getReference().child("actionRequested").child(serverid).child(userid).updateChildren(voteForPrevious);
+                                    Map<String, Object> voteToSkip = new HashMap<>();
+                                    voteToSkip.put("voteToSkip", 0);
+                                    //if this deletes other child then use merger option
+                                    mFirebaseDataBase.getReference().child("actionRequested").child(serverid).child(userid).updateChildren(voteToSkip);
+                                    mPreviousTrackbtn.setBackgroundColor(Color.parseColor("#000000FF"));
+                                    mNextTrackBtn.setBackgroundColor(Color.parseColor("#000000FF"));
                                 }
 
                             }
@@ -315,20 +354,11 @@ public class MusicPlayer extends AppCompatActivity {
 
             }
 
-            public void firebaseUpdate(){
 
-
-                DatabaseReference myRef = FirebaseDatabase.getInstance().getReference().child("testing");
-                //myRef.updateChildren()
-
-
-
-            }
 
             public void getCombinedPlaylist() throws JSONException {
 
                 String combinedURL = "http://benjaminlgur.pythonanywhere.com/start";
-               // String combinedURL = "http://192.168.1.3:5000/start";
                 serverid = getIntent().getStringExtra("serverid");
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("serverid", serverid);
@@ -356,6 +386,7 @@ public class MusicPlayer extends AppCompatActivity {
                                     song.setNumOfOccurences(s);
                                     String d = jsonArray1.getString(1);
                                     song.setUri(d);
+                                    Log.d("song " + i, ", " + d);
                                     String songname = jsonArray1.getString(2);
                                     song.setName(songname);
                                     String artist = jsonArray1.getJSONArray(3).getString(0);
@@ -582,11 +613,14 @@ public class MusicPlayer extends AppCompatActivity {
 
                                    Toast.makeText(MusicPlayer.this, playList.getPlayListURI(), Toast.LENGTH_LONG);
                                  //  mSpotifyAppRemote.getPlayerApi().play(playList.getPlayListURI());
+                               Log.d("spotify uri", mSongs.get(position).getUri());
                                    mSpotifyAppRemote.getPlayerApi().play(mSongs.get(position).getUri());
                                     wasplayed = false;
                                     tracknum = position;
 
                                    isCurrentlyPlaying = true;
+                               mPreviousTrackbtn.setBackgroundColor(Color.parseColor("#000000FF"));
+                               mNextTrackBtn.setBackgroundColor(Color.parseColor("#000000FF"));
 
         //                       }else if(mPlayerState.track.uri == mSongs.get(position).getUri()){
         //                            mSpotifyAppRemote.getPlayerApi().pause();
@@ -622,7 +656,9 @@ public class MusicPlayer extends AppCompatActivity {
                    String songArtistName = songs.getArtist();
                     String name = songs.getName();
                   // name = name.substring(0).toUpperCase() + name.substring(1);
+                    if (name.length() > 30) {name = name.substring(0,27) + "...";}
                     songTitle.setText(name);
+                    if (songArtistName.length() > 30) {songArtistName = songArtistName.substring(0,27) + "...";}
                     songArtist.setText(songArtistName);
                     songOwner.setText("user: " + songownername);
                     position  = getAdapterPosition();
@@ -701,6 +737,8 @@ public class MusicPlayer extends AppCompatActivity {
             private void connected() {
 
 
+
+
                 // Subscribe to PlayerState
                 mSpotifyAppRemote.getPlayerApi()
                         .subscribeToPlayerState()
@@ -747,6 +785,43 @@ public class MusicPlayer extends AppCompatActivity {
                                     wasplayed = true;
                                     paused = true;
 
+
+
+                                    if(playerState.playbackPosition == 0) {
+
+                                        Map<String, Object> voteForPrevious = new HashMap<>();
+                                        voteForPrevious.put("voteForPrevious", 0);
+                                        //if this deletes other child then use merger option
+                                        mFirebaseDataBase.getReference().child("actionRequested").child(serverid).child(userid).updateChildren(voteForPrevious);
+                                        Map<String, Object> voteToSkip = new HashMap<>();
+                                        voteToSkip.put("voteToSkip", 0);
+                                        //if this deletes other child then use merger option
+                                        mFirebaseDataBase.getReference().child("actionRequested").child(serverid).child(userid).updateChildren(voteToSkip);
+                                        mPreviousTrackbtn.setBackgroundColor(Color.parseColor("#000000FF"));
+                                        mNextTrackBtn.setBackgroundColor(Color.parseColor("#000000FF"));
+
+                                        if (tracknum == mSongs.size() - 1) {
+
+
+
+                                            tracknum = 0;
+                                            mSpotifyAppRemote.getPlayerApi().play(mSongs.get(tracknum).getUri());
+                                            wasplayed = false;
+                                            mPreviousTrackbtn.setBackgroundColor(Color.parseColor("#000000FF"));
+                                            mNextTrackBtn.setBackgroundColor(Color.parseColor("#000000FF"));
+                                        } else {
+                                            tracknum++;
+                                            mSpotifyAppRemote.getPlayerApi().play(mSongs.get(tracknum).getUri());
+                                            wasplayed = false;
+                                            mPreviousTrackbtn.setBackgroundColor(Color.parseColor("#000000FF"));
+                                            mNextTrackBtn.setBackgroundColor(Color.parseColor("#000000FF"));
+                                        }
+                                    }
+
+
+
+
+
                                     Map<String,Object> votingValues = new HashMap<>();
                                     votingValues.put("isPaused","true");
                                      FirebaseDatabase.getInstance().getReference().child("isPlayerPaused").child(serverid).setValue(votingValues);
@@ -758,6 +833,12 @@ public class MusicPlayer extends AppCompatActivity {
                                 else{
                                     mPlayBtn.setImageResource(R.drawable.ic_pause_black_24dp);
                                     paused = false;
+
+
+
+                                     int x = 0;
+
+
                                     Map<String,Object> votingValues = new HashMap<>();
                                     votingValues.put("isPaused","false");
                                     FirebaseDatabase.getInstance().getReference().child("isPlayerPaused").child(serverid).setValue(votingValues);
@@ -767,57 +848,11 @@ public class MusicPlayer extends AppCompatActivity {
 
                                 }
 
-                                if(playerState.playbackPosition == track.duration) {
-
-                                    if (tracknum == mSongs.size() - 1) {
-                                        tracknum = 0;
-                                        mSpotifyAppRemote.getPlayerApi().play(mSongs.get(tracknum).getUri());
-                                        wasplayed = false;
-                                    } else {
-                                        tracknum++;
-                                        mSpotifyAppRemote.getPlayerApi().play(mSongs.get(tracknum).getUri());
-                                        wasplayed = false;
-                                    }
-                                }
 
                                 //Log.d("MainActivity", track.name + " by " + track.artist.name);
                             }
                         });
 
-
-
-
-
-
-
-
-
-
-
-        //        CallResult<PlayerState> playerStateCall = mSpotifyAppRemote.getPlayerApi().getPlayerState();
-        //        Result<PlayerState> playerStateResult = playerStateCall.await(10, TimeUnit.SECONDS);
-        //        if (playerStateResult.isSuccessful()) {
-        //            PlayerState playerState = playerStateResult.getData();
-        //            if(playerState.playbackPosition == playerState.track.duration){
-        //                if(tracknum == mSongs.size()-1){
-        //                    tracknum = 0;
-        //                    mSpotifyAppRemote.getPlayerApi().play(mSongs.get(tracknum).getUri());
-        //                }
-        //                else{
-        //                    tracknum++;
-        //                    mSpotifyAppRemote.getPlayerApi().play(mSongs.get(tracknum).getUri());
-        //                }
-        //            }
-        //            // have some fun with playerState
-        //        } else {
-        //            Throwable error = playerStateResult.getError();
-        //            // try to have some fun with the error
-        //        }
-
-
-
-
-                // Then we will write some more code here.
 
             }
 

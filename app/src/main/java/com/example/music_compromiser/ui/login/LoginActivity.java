@@ -55,7 +55,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final int REQUEST_CODE = 1337;
     private static final String REDIRECT_URI = "musiccompromiser://callback";
     private static final String SCOPES = "streaming,user-read-currently-playing,user-read-playback-position,app-remote-control,user-read-recently-played,user-library-modify,user-read-email,user-read-private,playlist-read-collaborative,playlist-read-private,user-top-read,playlist-modify,playlist-modify-public,playlist-modify-private,user-library-modify";
-    private static final String CLIENT_ID = "";
+    private static final String CLIENT_ID = "0fc19e947472492c930bef713d0d5482";
 
 
 
