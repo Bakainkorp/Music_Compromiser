@@ -29,6 +29,7 @@ def host():
         
         #Used for temporary information storage between phones and routes
         #ServerID prevents the database from making mistakes via duplicate
+        fileString = json.dumps(output)
         database.insert ({
             "User" : host,
             "ServerID" : server.serverid,
@@ -56,6 +57,7 @@ def join():
                 server.user_join(client, data)
                 success['success'] = 'True'
                 
+                fileString = json.dumps(success)
                 database.insert ({
                     "User" : client,
                     "ServerID" : server.serverid,
@@ -65,6 +67,15 @@ def join():
                 
                 pik.save()
                 return json.dumps(success)
+                
+        fileString = json.dumps(success)
+        database.insert ({
+            "User" : client,
+            "ServerID" : server.serverid,
+            "JSON file" : fileString,
+            "Prep" : False
+        })
+        
         pik.save()
         return json.dumps(success)
     except:
