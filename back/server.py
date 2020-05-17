@@ -13,6 +13,8 @@ database = mongo.db.database
 
 @app.route('/', methods=['GET'])
 def landing():
+    database.insert ({
+        "User" : "host","ServerID" : "server.serverid", "Prep" : False})
     return """<h1>Da Landing</h1>"""
 
 @app.route('/host', methods=['POST'])
@@ -30,6 +32,7 @@ def host():
         database.insert ({
             "User" : host,
             "ServerID" : server.serverid,
+            "JSON file" : fileString,
             "Prep" : False
         })
         
@@ -56,6 +59,7 @@ def join():
                 database.insert ({
                     "User" : client,
                     "ServerID" : server.serverid,
+                    "JSON file" : fileString,
                     "Prep" : False
                 })
                 
@@ -89,7 +93,7 @@ def start():
                 database.insert ({
                     "ServerID" : server.serverid,
                     "JSON file" : fileString,
-                    "Users" : Users
+                    "Users" : Users,
                     "Prep" : True
                 })
                 
