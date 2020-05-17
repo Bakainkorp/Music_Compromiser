@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, redirect, url_for
 from flask_pymongo import PyMongo
 import json
 import classes
@@ -13,31 +13,29 @@ database = mongo.db.database
 
 @app.route('/', methods=['GET'])
 def landing():
-    database.insert ({
-        "User" : "host","ServerID" : "server.serverid", "Prep" : False})
-    return """<h1>Da Landing</h1>"""
+    return '<h1>Da Landing</h1>'
 
 @app.route('/host', methods=['POST'])
 def host():
     try:
         pik.load()
         input = request.get_json()
-        host = input['user']
-        data = input['data'] #this should be the top tracks json that you get from the api call
-        server = Server(host, data)
-        output = {'serverid': server.serverid}
-        
-        #Used for temporary information storage between phones and routes
-        #ServerID prevents the database from making mistakes via duplicate
-        fileString = json.dumps(output)
-        database.insert ({
-            "User" : host,
-            "ServerID" : server.serverid,
-            "JSON file" : fileString,
-            "Prep" : False
-        })
-        
+        if input:
+            host = input['user']
+            data = input['data'] #this should be the top tracks json that you get from the api call
+            server = Server(host, data)
+            output = {'serverid': server.serverid}
+
+            #Used for temporary information storage between phones and routes
+            #ServerID prevents the database from making mistakes via duplicate information
+            database.insert ({
+                "User" : host,
+                "ServerID" : server.serverid,
+                "Prep" : False
+            })
+
         pik.save()
+
         return json.dumps(output)
     except Exception as e:
         return str(e)
@@ -56,26 +54,26 @@ def join():
             if str(server.serverid) == serverid:
                 server.user_join(client, data)
                 success['success'] = 'True'
-                
-                fileString = json.dumps(success)
+
+                #Used for temporary information storage between phones and routes
+                #ServerID prevents the database from making mistakes via duplicate information
                 database.insert ({
                     "User" : client,
                     "ServerID" : server.serverid,
-                    "JSON file" : fileString,
                     "Prep" : False
                 })
-                
+
                 pik.save()
                 return json.dumps(success)
-                
-        fileString = json.dumps(success)
+
+        #Used for temporary information storage between phones and routes
+        #ServerID prevents the database from making mistakes via duplicate information
         database.insert ({
             "User" : client,
             "ServerID" : server.serverid,
-            "JSON file" : fileString,
             "Prep" : False
         })
-        
+
         pik.save()
         return json.dumps(success)
     except:
@@ -91,7 +89,7 @@ def start():
             if str(server.serverid) == str(serverid):
                 if len(server.complist) == 0:
                     server.make_comprimise()
-                
+
                 #fileString is the entire JSON file combined with all participating users
                 #Prep allows /select to find only items with JSON files attached to them
                 sameSID = database.find_one({'ServerID' : server.ServerID})
@@ -99,7 +97,7 @@ def start():
                 while sameSID:
                     Users.append(sameSID['User'])
                     database.remove(sameSID)
-                    document = database.find_one({'ServerID' : server.ServerID})
+                    sameSID = database.find_one({'ServerID' : server.ServerID})
                 fileString = json.dumps(server.complist)
                 database.insert ({
                     "ServerID" : server.serverid,
@@ -107,9 +105,9 @@ def start():
                     "Users" : Users,
                     "Prep" : True
                 })
-                
+
                 pik.save()
-                return(json.dumps(server.complist))
+                return fileString
         pik.save()
         return 'server not found'
     except Exception as e:
@@ -124,45 +122,45 @@ def show():
         out.append(server.serverid)
     pik.save()
     return json.dumps(out)
-    
+
 #User presses "Past Playlists" and the Server returns every playlist the User participated in
 #Returns userPlaylists, which is an array of all serverIDs, meaning different playlists
-@app.route('/select', methods=['POST'])
-def select(theUser):
-    try:
-        pik.load()
-        userPlaylists = []
-        
-        pastPlaylists = database.find({'Prep' : True})
-        for x in pastPlaylists:
-            check = x['Users']
-            while len(check) != 0:
-                if check[0] == theUser:
-                    userPlaylists.append(x['ServerID'])
-                check.pop(0)
-        
-        pik.save()
-        
-        return json.dumps(userPlaylists)
-    except Exception as e:
-        return str(e)
-        
+#@app.route('/select', methods=['POST'])
+#def select(theUser):
+#    try:
+#        pik.load()
+#        userPlaylists = []
+
+#        pastPlaylists = database.find({'Prep' : True})
+#        for x in pastPlaylists:
+#            check = x['Users']
+#            while len(check) != 0:
+#                if check[0] == theUser:
+#                    userPlaylists.append(x['ServerID'])
+#                check.pop(0)
+
+#        pik.save()
+
+#        return json.dumps(userPlaylists)
+#    except Exception as e:
+#        return str(e)
+
 #User presses the desired playlist
 #Returns the JSON file in pastPlaylist, which has the same ID as the user's choice
-@app.route('/pastplay', methods=['POST'])
-def pastplay(theID):
-    try:
-        pik.load()
-        pastPlaylist = database.find_one({"$and":
-            [{'Prep' : True},
-            {'ServerID' : theID}]})
-        pik.save()
-        
-        return json.dumps(pastPlaylist['JSON file'])
-    except Exception as e:
-        return str(e)
-        
-        
+#@app.route('/pastplay', methods=['POST'])
+#def pastplay(theID):
+#    try:
+#        pik.load()
+#        pastPlaylist = database.find_one({"$and":
+#            [{'Prep' : True},
+#            {'ServerID' : theID}]})
+#        pik.save()
+
+#        return json.dumps(pastPlaylist['JSON file'])
+#    except Exception as e:
+#        return str(e)
+
+
 
 @app.route('/kill')
 def kill():
