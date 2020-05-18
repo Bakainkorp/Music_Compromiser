@@ -73,11 +73,11 @@ public class LoginActivity extends AppCompatActivity {
 
 
     private void authenticateSpotify() {
-        AuthorizationRequest.Builder builder = new AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI);
-        builder.setScopes(new String[]{SCOPES});
-        AuthorizationRequest request = builder.build();
-
-        AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request);
+                AuthorizationRequest.Builder builder =
+                new AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI);
+                builder.setScopes(new String[]{SCOPES});
+                AuthorizationRequest request = builder.build();
+                AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request);
     }
 
     @Override

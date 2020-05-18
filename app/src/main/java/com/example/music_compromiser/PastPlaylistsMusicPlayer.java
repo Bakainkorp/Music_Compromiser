@@ -19,7 +19,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.music_compromiser.ui.login.MusicPlayer;
 import com.example.music_compromiser.ui.login.Song;
@@ -30,6 +35,9 @@ import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.protocol.client.CallResult;
 import com.spotify.protocol.types.Image;
 import com.spotify.protocol.types.Track;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -170,6 +178,66 @@ public class PastPlaylistsMusicPlayer extends AppCompatActivity {
 
             }
         });
+
+
+    }
+
+
+
+    public void getSongs() throws JSONException {
+
+
+        String pastURL = "https://Bakainkorp.pythonanywhere.com/pastplay";
+
+        String username = getIntent().getStringExtra("username");
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("Serverid", serverid);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, pastURL, jsonObject,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+
+                              String x = response.getString("test");
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("errorjer", "error" );
+                        Log.d("data", error.getCause().toString());
+                    }
+                }){
+
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String token = mSharedPreferences.getString("token", "");
+                String auth = "Bearer " + token;
+                headers.put("Authorization", auth);
+                return headers;
+            }
+
+
+        };
+
+        mRequestQueue.add(jsonObjectRequest);
+
+
+
+
+
+
 
 
     }

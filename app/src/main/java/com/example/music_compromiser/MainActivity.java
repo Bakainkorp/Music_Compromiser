@@ -120,8 +120,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent pastPlaylistsintent = new Intent(MainActivity.this, PastPlaylists.class);
-
-
+                pastPlaylistsintent.putExtra("username", username);
                 startActivity(pastPlaylistsintent);
             }
         });
@@ -214,17 +213,7 @@ public class MainActivity extends AppCompatActivity {
 
                         JSONArray jsonArray = response.optJSONArray("items");
                         Log.d("toptracksjson1", jsonArray.toString());
-
-
                         topsongs = jsonArray;
-
-                        //Log.d("data", response.toString());
-
-
-
-
-                                 //Log.d("data", jsonArray.getJSONObject(i).toString());
-
                     }
                 },
                 new Response.ErrorListener() {
@@ -246,47 +235,5 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
-// tell other phone that this phone was able to connect and send this phones own serverid and userid to other
-    // phone
-    public void sendConnectionWorks(){
-        String url = "";
-
-       StringRequest stringRequest = new StringRequest(Request.Method.PUT, url, new Response.Listener<String>() {
-           @Override
-           public void onResponse(String response) {
-
-           }
-       },
-               new Response.ErrorListener() {
-                   @Override
-                   public void onErrorResponse(VolleyError error) {
-
-                   }
-               }) {
-           @Override
-           protected Map<String, String> getParams() {
-               Map<String, String> params = new HashMap<String, String>();
-               params.put("connectionworked", "True");
-
-               return params;
-           }
-
-           @Override
-           public Map<String, String> getHeaders() throws AuthFailureError {
-               Map<String, String> params = new HashMap<String, String>();
-
-               return params;
-           }
-
-       };
-
-       mRequestQueue.add(stringRequest);
-
-
-    }
-
-
-
 
 }

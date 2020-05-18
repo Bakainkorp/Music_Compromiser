@@ -102,11 +102,44 @@ public class MusicPlayerJoining extends AppCompatActivity {
         mNextTrackBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Map<String, Object> voteToSkip = new HashMap<>();
-                voteToSkip.put("voteToSkip", 1);
-                //if this deletes other child then use merger option
-                mFirebaseBaseDatabase.getReference().child("actionRequested").child(mServerID).child(mUserID).updateChildren(voteToSkip);
-                mNextTrackBtn.setBackgroundColor(Color.parseColor("#FF0000"));
+
+
+                mFirebaseBaseDatabase.getReference().child("actionRequested").child(mServerID).child(mUserID).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.hasChild("voteToSkip")){
+                            long x = (long) dataSnapshot.child("voteToSkip").getValue();
+                            if(x == 1){
+                                Map<String, Object> changevoteToSkip = new HashMap<>();
+                                changevoteToSkip.put("voteToSkip", 0);
+                                mFirebaseBaseDatabase.getReference().child("actionRequested").child(mServerID).child(mUserID).updateChildren(changevoteToSkip);
+                                mNextTrackBtn.setBackgroundColor(Color.parseColor("#000000FF"));
+                            }
+                            else if(x == 0){
+                                Map<String, Object> changevoteToSkip = new HashMap<>();
+                                changevoteToSkip.put("voteToSkip", 1);
+                                mFirebaseBaseDatabase.getReference().child("actionRequested").child(mServerID).child(mUserID).updateChildren(changevoteToSkip);
+                                mNextTrackBtn.setBackgroundColor(Color.parseColor("#FF0000"));
+
+                            }
+                        }
+
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+
+
+//                Map<String, Object> voteToSkip = new HashMap<>();
+//                voteToSkip.put("voteToSkip", 1);
+//                //if this deletes other child then use merger option
+//                mFirebaseBaseDatabase.getReference().child("actionRequested").child(mServerID).child(mUserID).updateChildren(voteToSkip);
+//                mNextTrackBtn.setBackgroundColor(Color.parseColor("#FF0000"));
 
 
             }
@@ -115,11 +148,46 @@ public class MusicPlayerJoining extends AppCompatActivity {
         mPreviousTrackbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Map<String, Object> voteToSkip = new HashMap<>();
-                voteToSkip.put("voteForPrevious", 1);
-                //if this deletes other child then use merger option
-                mFirebaseBaseDatabase.getReference().child("actionRequested").child(mServerID).child(mUserID).updateChildren(voteToSkip);
-                mPreviousTrackbtn.setBackgroundColor(Color.parseColor("#FF0000"));
+
+                mFirebaseBaseDatabase.getReference().child("actionRequested").child(mServerID).child(mUserID).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.hasChild("voteForPrevious")){
+                            long x = (long) dataSnapshot.child("voteForPrevious").getValue();
+                            if(x == 1){
+                                Map<String, Object> changevoteToSkip = new HashMap<>();
+                                changevoteToSkip.put("voteForPrevious", 0);
+                                mFirebaseBaseDatabase.getReference().child("actionRequested").child(mServerID).child(mUserID).updateChildren(changevoteToSkip);
+                                mPreviousTrackbtn.setBackgroundColor(Color.parseColor("#000000FF"));
+                            }
+                            else if(x == 0){
+                                Map<String, Object> changevoteToSkip = new HashMap<>();
+                                changevoteToSkip.put("voteForPrevious", 1);
+                                mFirebaseBaseDatabase.getReference().child("actionRequested").child(mServerID).child(mUserID).updateChildren(changevoteToSkip);
+                                mPreviousTrackbtn.setBackgroundColor(Color.parseColor("#FF0000"));
+
+                            }
+                        }
+
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+
+
+
+
+
+//                Map<String, Object> voteToSkip = new HashMap<>();
+//                voteToSkip.put("voteForPrevious", 1);
+//                //if this deletes other child then use merger option
+//                mFirebaseBaseDatabase.getReference().child("actionRequested").child(mServerID).child(mUserID).updateChildren(voteToSkip);
+//                mPreviousTrackbtn.setBackgroundColor(Color.parseColor("#FF0000"));
 
 
             }
@@ -213,8 +281,8 @@ public class MusicPlayerJoining extends AppCompatActivity {
 
                     }
 
-                    mPreviousVoteCount.setText(String.valueOf(totalVoteForPrevious));
-                    mNextVoteCount.setText(String.valueOf(totalVoteToSkip));
+                    mPreviousVoteCount.setText(String.valueOf(totalVoteForPrevious) + '/' + String.valueOf((int)Math.floor(userCount/2) + 1));
+                    mNextVoteCount.setText(String.valueOf(totalVoteToSkip) + '/' + String.valueOf((int)Math.floor(userCount/2) + 1));
 
                     Log.d("totalvotetoskip", String.valueOf(totalVoteToSkip));
                     Log.d("totalvotetoskipprev", String.valueOf(totalVoteForPrevious));
@@ -316,7 +384,9 @@ public class MusicPlayerJoining extends AppCompatActivity {
             String songArtistName = songs.getArtist();
             String name = songs.getName();
             // name = name.substring(0).toUpperCase() + name.substring(1);
+            if (name.length() > 25) {name = name.substring(0,22) + "...";}
             songTitle.setText(name);
+            if (songArtistName.length() > 25) {songArtistName = songArtistName.substring(0,22) + "...";}
             songArtist.setText(songArtistName);
             songOwner.setText("user: " + songownername);
             position = getAdapterPosition();

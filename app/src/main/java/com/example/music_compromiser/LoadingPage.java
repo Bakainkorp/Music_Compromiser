@@ -67,8 +67,8 @@ public class LoadingPage extends AppCompatActivity {
 
     public void joinServer() throws JSONException {
 
-        String joinURL = "https://benjaminlgur.pythonanywhere.com/join";
-      //  String joinURL = "http://192.168.1.3:5000/join";
+       // String joinURL = "https://benjaminlgur.pythonanywhere.com/join";
+        String joinURL = "https://Bakainkorp.pythonanywhere.com/join";
 
         mOtherPhoneServerid = getIntent().getStringExtra("userserverid");
         mTopSongs = getIntent().getStringExtra("data");
