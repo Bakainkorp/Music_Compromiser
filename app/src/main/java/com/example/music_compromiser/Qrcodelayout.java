@@ -49,8 +49,8 @@ public class Qrcodelayout extends AppCompatActivity {
     private String userid;
     private String mServerid = ""; // the server id from the server for each user phone
     private String URL;
-  //private String mServerURLHost = "https://192.168.1.3:5000/host";
-    private String mServerURLHost = "https://benjaminlgur.pythonanywhere.com/host";
+    private String mServerURLHost = "https://Bakainkorp.pythonanywhere.com/host";
+    //private String mServerURLHost = "https://benjaminlgur.pythonanywhere.com/host";
     private String mServerURLJoin;
     private Button mContinueButton;
     private String connection = "";
@@ -70,44 +70,6 @@ public class Qrcodelayout extends AppCompatActivity {
 
         userid = getIntent().getStringExtra("userid");
 
-//         URL = "";
-//
-//        username = getIntent().getStringExtra("username");
-//        userid = getIntent().getStringExtra("userid");
-//
-//        mRequestQueue = Volley.newRequestQueue(this);
-//
-//        StringRequest stringRequest = new StringRequest(Request.Method.PUT, URL, new Response.Listener<String>() {
-//            @Override
-//            public void onResponse(String response) {
-//
-//            }
-//
-//        }, new Response.ErrorListener(){
-//            @Override
-//           public void onErrorResponse(VolleyError error){
-//
-//            }
-//        }) {
-//            @Override
-//            protected Map<String, String> getParams() {
-//                Map<String, String> params = new HashMap<String, String>();
-//                params.put("user", username);
-//                params.put("userid", userid);
-//
-//                return params;
-//            }
-//
-//            @Override
-//            public Map<String, String> getHeaders() throws AuthFailureError {
-//                Map<String, String> params = new HashMap<String, String>();
-//                params.put("Content-Type", "application/x-www-form-urlencoded");
-//                return params;
-//            }
-//
-//        };
-//        mRequestQueue.add(stringRequest);
-
         try {
             getServerID();
         } catch (JSONException e) {
@@ -123,8 +85,6 @@ public class Qrcodelayout extends AppCompatActivity {
         mContinueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               // if(connection.equals("True")){
-
 
                 Map<String, Object> currentlyPlayingSong = new HashMap<>();
                 currentlyPlayingSong.put("currentSong", "empty");
@@ -136,10 +96,7 @@ public class Qrcodelayout extends AppCompatActivity {
                     intent.putExtra("userid", userid);
                     intent.putExtra("username", username);
                     startActivity(intent);
-              //  }
-               // else{
-                //    Toast.makeText(Qrcodelayout.this, "Connection Unsuccessful", Toast.LENGTH_LONG).show();
-               // }
+
             }
         });
 
@@ -157,12 +114,6 @@ public class Qrcodelayout extends AppCompatActivity {
         username = getIntent().getStringExtra("username");
         String topsongs = getIntent().getStringExtra("topsongs");
         JSONArray array = new JSONArray(topsongs);
-
-//        Map<String, String> postParam= new HashMap<String, String>();
-//        postParam.put("user", username);
-//        postParam.put("data", array.toString());
-       // new JSONObject(postParam)
-
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("user", username);
@@ -219,114 +170,10 @@ public class Qrcodelayout extends AppCompatActivity {
                 return headers;
             }
 
-
-        };
-
-
-        mRequestQueue.add(jsonObjectRequest);
-    }
-
-
-    //check if user that pressed join button connects to phone
-    public void userConnected(){
-        String url = "";
-
-
-        mRequestQueue = Volley.newRequestQueue(this);
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            JSONObject jsonObject = response.optJSONObject("connectionworks");
-                            connection = jsonObject.toString();
-
-
-                        }catch (Exception e){
-
-                        }
-
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-
-                    }
-                }){
-
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String> headers = new HashMap<>();
-                    String token = mSharedPreferences.getString("token", "");
-                    String auth = "Bearer " + token;
-                    headers.put("Authorization", auth);
-                    return headers;
-                }
-
-
         };
 
         mRequestQueue.add(jsonObjectRequest);
 
-
     }
-
-
-    //tell other user to continue to playlist layout
-    public void signalOtherUser(){
-        String url = "";
-        mRequestQueue = Volley.newRequestQueue(this);
-
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-              new Response.Listener<String>() {
-
-            @Override
-            public void onResponse(String response){
-                try {
-
-                }catch (Exception e){
-
-                }
-
-            }
-
-        },
-             new Response.ErrorListener()  {
-                 @Override
-                 public void onErrorResponse(VolleyError error) {
-
-                 }
-
-             })  {
-
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("Continue", "True");
-                params.put("userid", otherphoneid);
-
-                return params;
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<>();
-                String token = mSharedPreferences.getString("token", "");
-                String auth = "Bearer " + token;
-                headers.put("Authorization", auth);
-                return headers;
-            }
-
-
-                };
-
-
-
-        mRequestQueue.add(stringRequest);
-
-    }
-
-
 
 }

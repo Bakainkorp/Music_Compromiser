@@ -138,19 +138,8 @@ public class MusicPlayer extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-        //        try {
-        //            makePlaylist();
-        //        } catch (JSONException e) {
-        //            e.printStackTrace();
-        //            Log.d("createplaylisterror", e.getCause().toString());
-        //        }
-
-
                 mRecyclerView = (RecyclerView) findViewById(R.id.song_recyclerview);
                 mRecyclerView.setLayoutManager(new LinearLayoutManager(MusicPlayer.this));
-                // mPlaylistId = getIntent().getStringExtra("playListId");
-                //  mPlaylistURI = getIntent().getStringExtra("endPoint");
-
 
                 mPlayBtn = (ImageButton) findViewById(R.id.playbuttonbottom);
                 mTextview = findViewById(R.id.textviewbottom);
@@ -161,11 +150,6 @@ public class MusicPlayer extends AppCompatActivity {
                 mNextCountVote = findViewById(R.id.ID_nextCountVote);
                 mPreviousCountVote = findViewById(R.id.ID_previousCount);
 
-
-
-
-                // mNextTrackBtn = (ImageButton) findViewById(R.id.next_btn);
-                // mPreviousTrackbtn = (ImageButton) findViewById(R.id.previous_btn);
 
 
                 mPlayBtn.setOnClickListener(new View.OnClickListener() {
@@ -200,13 +184,44 @@ public class MusicPlayer extends AppCompatActivity {
                 mNextTrackBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // mSpotifyAppRemote.getPlayerApi().skipNext();
 
-                        Map<String, Object> voteToSkip = new HashMap<>();
-                        voteToSkip.put("voteToSkip", 1);
-                        //if this deletes other child then use merger option
-                        mFirebaseDataBase.getReference().child("actionRequested").child(serverid).child(userid).updateChildren(voteToSkip);
-                        mNextTrackBtn.setBackgroundColor(Color.parseColor("#FF0000"));
+
+                        // check tomorrow
+                        mFirebaseDataBase.getReference().child("actionRequested").child(serverid).child(userid).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if(dataSnapshot.hasChild("voteToSkip")){
+                                   long x = (long) dataSnapshot.child("voteToSkip").getValue();
+                                   if(x == 1){
+                                       Map<String, Object> changevoteToSkip = new HashMap<>();
+                                       changevoteToSkip.put("voteToSkip", 0);
+                                       mFirebaseDataBase.getReference().child("actionRequested").child(serverid).child(userid).updateChildren(changevoteToSkip);
+                                       mNextTrackBtn.setBackgroundColor(Color.parseColor("#000000FF"));
+                                   }
+                                   else if(x == 0){
+                                       Map<String, Object> changevoteToSkip = new HashMap<>();
+                                       changevoteToSkip.put("voteToSkip", 1);
+                                       mFirebaseDataBase.getReference().child("actionRequested").child(serverid).child(userid).updateChildren(changevoteToSkip);
+                                       mNextTrackBtn.setBackgroundColor(Color.parseColor("#FF0000"));
+
+                                   }
+                                }
+
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
+                         // original if top doesnt work change back to this
+//                        Map<String, Object> voteToSkip = new HashMap<>();
+//                        voteToSkip.put("voteToSkip", 1);
+//                        //if this deletes other child then use merger option
+//                        mFirebaseDataBase.getReference().child("actionRequested").child(serverid).child(userid).updateChildren(voteToSkip);
+//                        mNextTrackBtn.setBackgroundColor(Color.parseColor("#FF0000"));
 
 
 
@@ -228,11 +243,45 @@ public class MusicPlayer extends AppCompatActivity {
                 mPreviousTrackbtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Map<String, Object> voteToSkip = new HashMap<>();
-                        voteToSkip.put("voteForPrevious", 1);
-                        //if this deletes other child then use merger option
-                       mFirebaseDataBase.getReference().child("actionRequested").child(serverid).child(userid).updateChildren(voteToSkip);
-                        mPreviousTrackbtn.setBackgroundColor(Color.parseColor("#FF0000"));
+
+                        mFirebaseDataBase.getReference().child("actionRequested").child(serverid).child(userid).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if(dataSnapshot.hasChild("voteForPrevious")){
+                                    long x = (long) dataSnapshot.child("voteForPrevious").getValue();
+                                    if(x == 1){
+                                        Map<String, Object> changevoteToSkip = new HashMap<>();
+                                        changevoteToSkip.put("voteForPrevious", 0);
+                                        mFirebaseDataBase.getReference().child("actionRequested").child(serverid).child(userid).updateChildren(changevoteToSkip);
+                                        mPreviousTrackbtn.setBackgroundColor(Color.parseColor("#000000FF"));
+                                    }
+                                    else if(x == 0){
+                                        Map<String, Object> changevoteToSkip = new HashMap<>();
+                                        changevoteToSkip.put("voteForPrevious", 1);
+                                        mFirebaseDataBase.getReference().child("actionRequested").child(serverid).child(userid).updateChildren(changevoteToSkip);
+                                        mPreviousTrackbtn.setBackgroundColor(Color.parseColor("#FF0000"));
+
+                                    }
+                                }
+
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
+
+
+
+
+//                        Map<String, Object> voteToSkip = new HashMap<>();
+//                        voteToSkip.put("voteForPrevious", 1);
+//                        //if this deletes other child then use merger option
+//                       mFirebaseDataBase.getReference().child("actionRequested").child(serverid).child(userid).updateChildren(voteToSkip);
+//                        mPreviousTrackbtn.setBackgroundColor(Color.parseColor("#FF0000"));
                     }
                 });
 
@@ -256,8 +305,8 @@ public class MusicPlayer extends AppCompatActivity {
 
                             }
 
-                            mPreviousCountVote.setText(String.valueOf(totalVoteForPrevious));
-                            mNextCountVote.setText(String.valueOf(totalVoteToSkip));
+                            mPreviousCountVote.setText(String.valueOf(totalVoteForPrevious) + '/' + String.valueOf((int)Math.floor(userCount/2) + 1));
+                            mNextCountVote.setText(String.valueOf(totalVoteToSkip) + '/' + String.valueOf((int)Math.floor(userCount/2) + 1));
 
                             Log.d("totalvotetoskip", String.valueOf(totalVoteToSkip));
                             Log.d("totalvotetoskipprev", String.valueOf(totalVoteForPrevious));
@@ -347,18 +396,14 @@ public class MusicPlayer extends AppCompatActivity {
                 });
 
 
-
-
-
-
-
             }
 
 
 
             public void getCombinedPlaylist() throws JSONException {
 
-                String combinedURL = "http://benjaminlgur.pythonanywhere.com/start";
+                String combinedURL = "https://Bakainkorp.pythonanywhere.com/start";
+               // String combinedURL = "https://benjamin/gur.pythonanywhere.com/start";
                 serverid = getIntent().getStringExtra("serverid");
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("serverid", serverid);
@@ -444,149 +489,8 @@ public class MusicPlayer extends AppCompatActivity {
 
                 mRequestQueue.add(jsonArrayRequest);
 
-
-
-
             }
 
-            public void makePlaylist() throws JSONException {
-
-
-                userid = getIntent().getStringExtra("userid");
-
-                String makePlaylistURL = "https://api.spotify.com/v1/users/" + userid + "/playlists";
-
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("name", "Music Compromiser");
-
-
-                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, makePlaylistURL, jsonObject,
-                        new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response) {
-
-                              String json;
-                                try {
-                                    mPlaylistURI = response.getString("uri");
-                                    mPlaylistId = response.getString("id");
-                                    playList.setPlayListURI(response.getString("uri"));
-
-
-
-
-
-
-
-                                    String allsongs = "uris=";
-
-                                    String addSongsToPlaylistURL = "https://api.spotify.com/v1/playlists/" + mPlaylistId + "/tracks";
-
-                                    for(int i=0; i< mSongs.size(); i++){
-                                        if(i==mSongs.size()-1){
-                                            allsongs = allsongs + mSongs.get(i).getUri();
-                                        }
-                                        else {
-                                            allsongs = allsongs + mSongs.get(i).getUri() + ",";
-                                        }
-                                    }
-
-                                    Log.d("allsongsstring", allsongs);
-
-                                    JSONObject jsonObject = new JSONObject();
-                                    jsonObject.put("uris", allsongs);
-                                    JSONArray jsonArray = new JSONArray();
-                                    jsonArray.put(jsonObject);
-
-                                    Log.d("thissidhishids", mPlaylistId);
-                                    JsonObjectRequest jsonObjectRequest1 = new JsonObjectRequest(Request.Method.POST, addSongsToPlaylistURL+"?"+allsongs, null,
-                                            new Response.Listener<JSONObject>() {
-                                                @Override
-                                                public void onResponse(JSONObject response) {
-
-        //                                            String json;
-        //                                            try {
-        //                                              //  mPlaylistURI = response.getString("uri");
-        //
-        //                                            } catch (JSONException e) {
-        //                                                e.printStackTrace();
-        //                                                Log.d("addingsongserror", e.getCause().toString());
-        //                                            }
-
-
-                                                }
-                                            },
-                                            new Response.ErrorListener() {
-                                                @Override
-                                                public void onErrorResponse(VolleyError error) {
-
-
-                                                }
-                                            }){
-
-
-                                        @Override
-                                        public Map<String, String> getHeaders() throws AuthFailureError {
-                                            Map<String, String> headers = new HashMap<>();
-                                            String token = mSharedPreferences.getString("token", "");
-                                            String auth = "Bearer " + token;
-                                            headers.put("Authorization", auth);
-                                            headers.put("Content-Type", "application/json");
-
-                                            return headers;
-                                        }
-
-
-
-
-                                    };
-                                    mRequestQueue.add(jsonObjectRequest1);
-
-
-
-
-
-
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-
-
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                              //  Log.d("onerrorresponse", error.getMessage().toString());
-
-
-                            }
-                        }){
-
-
-                    @Override
-                    public Map<String, String> getHeaders() throws AuthFailureError {
-                        Map<String, String> headers = new HashMap<>();
-                        String token = mSharedPreferences.getString("token", "");
-                        String auth = "Bearer " + token;
-                        headers.put("Authorization", auth);
-                        headers.put("Content-Type", "application/json");
-
-                        return headers;
-                    }
-
-
-
-
-                };
-
-
-
-                mRequestQueue.add(jsonObjectRequest);
-
-
-
-
-            }
 
 
             class SongViewHolder extends RecyclerView.ViewHolder{
@@ -656,9 +560,9 @@ public class MusicPlayer extends AppCompatActivity {
                    String songArtistName = songs.getArtist();
                     String name = songs.getName();
                   // name = name.substring(0).toUpperCase() + name.substring(1);
-                    if (name.length() > 30) {name = name.substring(0,27) + "...";}
+                    if (name.length() > 25) {name = name.substring(0,22) + "...";}
                     songTitle.setText(name);
-                    if (songArtistName.length() > 30) {songArtistName = songArtistName.substring(0,27) + "...";}
+                    if (songArtistName.length() > 25) {songArtistName = songArtistName.substring(0,22) + "...";}
                     songArtist.setText(songArtistName);
                     songOwner.setText("user: " + songownername);
                     position  = getAdapterPosition();
@@ -736,9 +640,6 @@ public class MusicPlayer extends AppCompatActivity {
 
             private void connected() {
 
-
-
-
                 // Subscribe to PlayerState
                 mSpotifyAppRemote.getPlayerApi()
                         .subscribeToPlayerState()
@@ -748,7 +649,7 @@ public class MusicPlayer extends AppCompatActivity {
                             if (track != null) {
                                 String current = track.name;
                                // Log.d("duration", "values " + playerState.playbackPosition + " , " + track.duration);
-                                if (current.length() > 30) {current = current.substring(0,27) + "...";}
+                                if (current.length() > 12) {current = current.substring(0,9) + "...";}
                                 mTextview.setText(current);
                                 mCurrentArtist.setText(track.artist.name);
 
@@ -801,7 +702,6 @@ public class MusicPlayer extends AppCompatActivity {
                                         mNextTrackBtn.setBackgroundColor(Color.parseColor("#000000FF"));
 
                                         if (tracknum == mSongs.size() - 1) {
-
 
 
                                             tracknum = 0;
